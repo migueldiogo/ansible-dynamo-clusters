@@ -1,0 +1,19 @@
+---
+- name: update apt
+  apt:
+    update_cache: yes
+    upgrade: yes
+- name: install openjdk-8-jdk
+  apt:
+    name: openjdk-8-jdk
+- name: install python
+  apt:
+    name: python
+- name: install Cassandra
+  apt:
+    name: cassandra
+  copy:
+- name: override cassandra.yaml file
+  template: src=cassandra.yaml dest=/etc/cassandra/
+- name: run Cassandra service
+  command: sudo service cassandra start
