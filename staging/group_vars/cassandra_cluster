@@ -1,2 +1,0 @@
-cassandra_cluster_name: Cassandra_Cluster_Staging
-cassandra_seeds: [ {{hostvars.nodeX1.ens3.ipv4.address }}, {{ hostvars.nodeX2.ens3.ipv4.address }} ]

@@ -1,19 +1,45 @@
 ---
-- name: update apt
+- name: Add local hostname to /etc/hosts
+  lineinfile:
+    dest: /etc/hosts
+    line: "127.0.0.1 {{ansible_hostname}}"
+    state: present
+  become: yes
+- name: Update apt
   apt:
     update_cache: yes
-    upgrade: yes
-- name: install openjdk-8-jdk
+- name: install openjdk-8-jre
   apt:
-    name: openjdk-8-jdk
+    name: openjdk-8-jre
 - name: install python
   apt:
     name: python
-- name: install Cassandra
+- name: Add Cassandra repo to apt
+  apt_repository:
+    repo: deb http://www.apache.org/dist/cassandra/debian 311x main
+    filename: cassandra.sources
+    state: present
+- name: Add Cassandra keys to apt
+  apt_key:
+    url: https://www.apache.org/dist/cassandra/KEYS
+    state: present
+- name: Update apt
+  apt:
+    update_cache: yes
+- name: Install Cassandra
   apt:
     name: cassandra
-  copy:
-- name: override cassandra.yaml file
+- name: Stop Cassandra service
+  service:
+    name: cassandra
+    state: stopped
+- name: Remove all data files
+  shell: rm -rf /var/lib/cassandra/data/*
+  become: yes
+- name: Override cassandra.yaml config file
   template: src=cassandra.yaml dest=/etc/cassandra/
 - name: run Cassandra service
-  command: sudo service cassandra start
+  service:
+    name: cassandra
+    state: started
+  become: yes

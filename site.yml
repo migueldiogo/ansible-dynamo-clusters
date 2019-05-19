@@ -1,20 +1,21 @@
- ---
-- hosts: cassandra_cluster
-  gather_facts: yes
+---
+- hosts: all
   remote_user: ubuntu
+  gather_facts: yes
   become: yes
   roles:
     - setup_cassandra
-- hosts: cassandra_cluster
-  gather_facts: yes
-  remote_user: ubuntu
-  become: yes
-  roles:
-    - setup_riak
-- hosts: couchdb_cluster
-  gather_facts: yes
-  remote_user: ubuntu
-  become: yes
-  roles:
-    - setup_couchdb
+    
+# - hosts: all
+#   gather_facts: yes
+#   remote_user: ubuntu
+#   become: yes
+#   roles:
+#     - setup_riak
+# - hosts: all
+#   gather_facts: yes
+#   remote_user: ubuntu
+#   become: yes
+#   roles:
+#     - setup_couchdb
     

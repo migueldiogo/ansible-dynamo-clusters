@@ -1,0 +1,3 @@
+cassandra_cluster_name: Cassandra_Cluster
+cassandra_seeds: [ "{{hostvars.node01.ansible_ens3.ipv4.address }}", "{{ hostvars.node02.ansible_ens3.ipv4.address }}" ]
+ansible_python_interpreter: /usr/bin/python3
