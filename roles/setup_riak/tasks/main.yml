@@ -1,0 +1,45 @@
+---
+- name: Add local hostname to /etc/hosts
+  lineinfile:
+    dest: /etc/hosts
+    line: "127.0.0.1 {{ansible_hostname}}"
+    state: present
+  become: yes
+- name: Update apt
+  apt:
+    update_cache: yes
+- name: Add Riak repo to apt
+  shell: curl -s https://packagecloud.io/install/repositories/basho/riak/script.deb.sh | sudo bash
+- name: Install Riak
+  apt:
+    name: riak=2.2.3-1
+    state: present
+- name: Stop Riak
+  shell: riak stop
+  ignore_errors: yes
+- name: Replace nodename's ip
+  replace:
+    path: /etc/riak/riak.conf
+    regexp: 'nodename = riak@127.0.0.1'
+    replace: "nodename = riak@{{ansible_default_ipv4.address}}"
+- name: Delete Riak ring data
+  shell: rm /var/lib/riak/ring/*
+  ignore_errors: yes
+- name: Replace listeners' ip
+  replace:
+    path: /etc/riak/riak.conf
+    regexp: 'internal = 127.0.0.1'
+    replace: "internal = 0.0.0.0"
+- name: Start Riak
+  shell: riak start
+  ignore_errors: yes
+- name: Ping Riak node
+  shell: riak ping
+- name: Join node to cluster
+  shell: riak-admin cluster join riak@{{riak_cluster_coordinator}}
+  when: riak_cluster_coordinator != ansible_default_ipv4.address
+  retries: 3
+  delay: 3
+  register: result
+  until: result.rc == 0
+

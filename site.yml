@@ -6,16 +6,10 @@
   roles:
     - setup_cassandra
     
-# - hosts: all
-#   gather_facts: yes
-#   remote_user: ubuntu
-#   become: yes
-#   roles:
-#     - setup_riak
-# - hosts: all
-#   gather_facts: yes
-#   remote_user: ubuntu
-#   become: yes
-#   roles:
-#     - setup_couchdb
+- hosts: all
+  remote_user: ubuntu
+  gather_facts: yes
+  become: yes
+  roles:
+    - setup_riak
     
