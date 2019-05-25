@@ -1,0 +1,25 @@
+---
+- name: Start AWS instances
+  local_action:
+    module: ec2
+    aws_access_key: {{aws_access_key}}
+    aws_secret_key: {{aws_secret_key}}
+    region: eu-west-1
+    wait: yes
+    instance_tags:
+        Name: node
+    state: running
+- name: Load Cassandra write_consistency
+  shell: "chdir={{ycsb_home}} ./bin/ycsb load cassandra-cql -p hosts=\"{{load_balancer_ip_address}}\" -p threadcount=1 -p objectversionlimit=1 -p numobjects=10 -P workloads/myworkload -s"
+- name: Run Cassandra ONE
+  shell: "chdir={{ycsb_home}} ./bin/ycsb run cassandra-cql -p hosts=\"{{load_balancer_ip_address}}\" -p threadcount=1 -p objectversionlimit=1 -p numobjects=10 -P workloads/myworkload -s > {{results_home}}/{{ansible_date_time.epoch}}.dat"
+- name: Stop AWS instances
+  local_action:
+    module: ec2
+    aws_access_key: {{aws_access_key}}
+    aws_secret_key: {{aws_secret_key}}
+    region: eu-west-1
+    wait: yes
+    instance_tags:
+        Name: node
+    state: stopped

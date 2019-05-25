@@ -1,15 +1,21 @@
 ---
-- hosts: all
+- hosts: nodes
   remote_user: ubuntu
   gather_facts: yes
   become: yes
   roles:
     - setup_cassandra
-    
-- hosts: all
+- hosts: nodes
   remote_user: ubuntu
   gather_facts: yes
   become: yes
   roles:
     - setup_riak
-    
+- hosts: 127.0.0.1
+  connection: local
+  roles:
+    - prepare_cassandra
+- hosts: 127.0.0.1
+  connection: local
+  roles:
+    - {role: 'run_benchmark', tags: 'benchmark'}

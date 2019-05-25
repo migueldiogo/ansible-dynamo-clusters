@@ -1,4 +1,9 @@
 cassandra_cluster_name: Cassandra_Cluster
-cassandra_seeds: [ "{{hostvars.node01.ansible_ens3.ipv4.address }}", "{{ hostvars.node02.ansible_ens3.ipv4.address }}" ]
-riak_cluster_coordinator: "{{hostvars.node01.ansible_ens3.ipv4.address }}"
+cassandra_seeds: [ "{{hostvars.node01.ansible_default_ipv4.address }}", "{{ hostvars.node02.ansible_default_ipv4.address }}" ]
+riak_cluster_coordinator: "{{hostvars.node01.ansible_default_ipv4.address }}"
 ansible_python_interpreter: /usr/bin/python3
+load_balancer_ip_address: LB_IP_HERE
+ycsb_home: YCSB_HOME_HERE
+results_home: RESULTS_HOME_HERE
+aws_access_key: AWS_ACCESS_KEY_HERE
+aws_secret_key: AWS_SECRET_KEY_HERE

@@ -1,0 +1,5 @@
+---
+- name: Create Cassandra Keyspace
+  shell: "cqlsh {{load_balancer_ip_address}} -e \"CREATE KEYSPACE IF NOT EXISTS ycsb WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : 3 };\""
+- name: Create Workload Table
+  shell: "cqlsh {{load_balancer_ip_address}} -e \"USE ycsb; CREATE TABLE IF NOT EXISTS workload (y_id varchar primary key, version varchar);\""
