@@ -26,6 +26,6 @@ Temporary Items
 .apdisk
 
 # Ansible
-site.retry
-group_vars/*
-!group_vars/*
+*.retry
+group_vars/local
+

@@ -15,7 +15,4 @@
   connection: local
   roles:
     - prepare_cassandra
-- hosts: 127.0.0.1
-  connection: local
-  roles:
-    - {role: 'run_benchmark', tags: 'benchmark'}
+

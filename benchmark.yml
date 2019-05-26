@@ -1,0 +1,26 @@
+---
+- hosts: local
+  connection: local
+  tasks:
+  - name: Use role in loop
+    include_role:
+      name: run_benchmark
+    vars:
+      - description: "{{ item.description }}"
+      - db: "{{ item.db }}"
+      - write_consistency: "{{ item.write_consistency }}"
+      - read_consistency: "{{ item.read_consistency }}"
+      - threads: "{{ item.threads }}"
+      - objects_num: "{{ item.objects_num }}"
+      - version_num: "{{ item.version_num }}"
+    with_items:
+        - { description: cassandra, db: cassandra-cql, write_consistency: ALL, read_consistency: ALL, threads: 4, objects_num: 1000, version_num: 2 }
+        #- { description: cassandra, db: cassandra-cql, write_consistency: ALL, read_consistency: ALL, threads: 4, objects_num: 100, version_num: 3 }
+        #- { description: cassandra, db: cassandra-cql, write_consistency: QUORUM, read_consistency: ONE, threads: 4, objects_num: 100, version_num: 3 }
+        #- { description: cassandra, db: cassandra-cql, write_consistency: ONE, read_consistency: QUORUM, threads: 4, objects_num: 100, version_num: 3 }
+        #- { description: cassandra, db: cassandra-cql, write_consistency: QUORUM, read_consistency: QUORUM, threads: 4, objects_num: 100, version_num: 3 }
+        #- { description: riak, db: riak, write_consistency: ONE, read_consistency: ONE, threads: 4, objects_num: 100, version_num: 3 }
+        #- { description: riak, db: riak, write_consistency: ALL, read_consistency: ALL, threads: 4, objects_num: 100, version_num: 3 }
+        #- { description: riak, db: riak, write_consistency: QUORUM, read_consistency: ONE, threads: 4, objects_num: 100, version_num: 3 }
+        #- { description: riak, db: riak, write_consistency: ONE, read_consistency: QUORUM, threads: 4, objects_num: 100, version_num: 3 }
+        #- { description: riak, db: riak, write_consistency: QUORUM, read_consistency: QUORUM, threads: 4, objects_num: 100, version_num: 3 }
