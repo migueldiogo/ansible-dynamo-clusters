@@ -1,0 +1,5 @@
+---
+- name: "Analyse {{filename}}"
+  shell: "chdir={{analyser_home}} python -m bin.main run {{ycsb_results_home}} {{analysis_results_home}}/{{ansible_date_time.epoch}}_analysis.csv"
+
+

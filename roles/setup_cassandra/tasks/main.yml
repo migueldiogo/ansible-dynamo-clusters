@@ -5,21 +5,17 @@
     line: "127.0.0.1 {{ansible_hostname}}"
     state: present
   become: yes
-- name: Add repo public key
-  shell: apt-key adv --keyserver pool.sks-keyservers.net --recv-key A278B781FE4B2BDA
 - name: Add Cassandra repo to apt
   apt_repository:
     repo: deb http://www.apache.org/dist/cassandra/debian 311x main
     filename: cassandra.sources.list
     state: present
-- name: Add Cassandra keys to apt
-  apt_key:
-    url: https://www.apache.org/dist/cassandra/KEYS
-    state: present
+    update_cache: no
 - name: Update apt
   apt:
     update_cache: yes
     upgrade: yes
+    allow-unauthenticated: yes
 - name: install openjdk-8-jre
   apt:
     name: openjdk-8-jre
@@ -29,6 +25,7 @@
 - name: Install Cassandra
   apt:
     name: cassandra
+    allow-unauthenticated: yes
 - name: Stop Cassandra service
   service:
     name: cassandra
