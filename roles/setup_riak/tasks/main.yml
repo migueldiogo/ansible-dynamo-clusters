@@ -5,9 +5,6 @@
     line: "127.0.0.1 {{ansible_hostname}}"
     state: present
   become: yes
-- name: Update apt
-  apt:
-    update_cache: yes
 - name: Add Riak repo to apt
   shell: curl -s https://packagecloud.io/install/repositories/basho/riak/script.deb.sh | sudo bash
 - name: Install Riak
@@ -30,6 +27,11 @@
     path: /etc/riak/riak.conf
     regexp: 'internal = 127.0.0.1'
     replace: "internal = 0.0.0.0"
+- name: Replace storage_backend setting
+  replace:
+    path: /etc/riak/riak.conf
+    regexp: 'storage_backend = bitcask'
+    replace: "storage_backend = leveldb"
 - name: Start Riak
   shell: riak start
   ignore_errors: yes
@@ -42,4 +44,9 @@
   delay: 3
   register: result
   until: result.rc == 0
-
+- name: Plan cluster changes
+  shell: riak-admin cluster plan
+  when: riak_cluster_coordinator == ansible_default_ipv4.address
+- name: Commit cluster changes
+  shell: riak-admin cluster commit
+  when: riak_cluster_coordinator == ansible_default_ipv4.address

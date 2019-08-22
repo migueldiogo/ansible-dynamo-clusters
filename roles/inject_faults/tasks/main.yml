@@ -1,0 +1,28 @@
+---
+- name: With AWS instances started
+  local_action:
+    module: ec2
+    aws_access_key: "{{aws_access_key}}"
+    aws_secret_key: "{{aws_secret_key}}"
+    region: eu-west-1
+    wait: yes
+    instance_tags:
+        Name: node
+    state: running
+
+- name: gather facts from nodes
+  setup:
+  delegate_to: "{{facts_item}}"
+  delegate_facts: True
+  remote_user: ubuntu
+  loop: "{{groups['nodes']}}"
+  loop_control:
+    loop_var: facts_item
+
+- name: Interpolate fault_injection.sh
+  template: src=fault_injection.sh dest=fault_injection.sh
+
+- name: "Injecting network partition events in the background (see script.log)"
+  shell: "sh fault_injection.sh {{fault_duration}} {{fault_interval}} {{service}} ubuntu > script.log"
+  
+

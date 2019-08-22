@@ -1,0 +1,13 @@
+---
+- hosts: local
+  connection: local
+  tasks:
+  - name: Use role in loop
+    include_role:
+      name: inject_faults
+    vars:
+      - service: "{{ item.service }}"
+      - fault_duration: "{{ item.fault_duration }}"
+      - fault_interval: "{{ item.fault_interval }}"
+    with_items:
+        - { service: cassandra, fault_duration: 2, fault_interval: 25 }

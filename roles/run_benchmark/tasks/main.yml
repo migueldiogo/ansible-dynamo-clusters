@@ -21,43 +21,30 @@
         Name: node
     state: running
 
-- name: sleep for 100 seconds and continue with play
+- name: sleep for 60 seconds and continue with play
   wait_for:
-    timeout: 100
+    timeout: 60
 
-- name: gather facts from nodes
-  setup:
+- name: Start Riak
+  shell: riak start
+  become: yes
+  remote_user: ubuntu
   delegate_to: "{{facts_item}}"
   delegate_facts: True
-  remote_user: ubuntu
   loop: "{{groups['nodes']}}"
   loop_control:
     loop_var: facts_item
 
-- name: Interpolate fault_injection.sh
-  template: src=fault_injection.sh dest=fault_injection.sh
-  when: with_network_faults
+# - name: "Load {{description}} write_consistency={{write_consistency}}, read_consistency={{read_consistency}}"
+#   shell: "chdir=~/ycsb ./bin/ycsb load {{db}} -p hosts={{load_balancer_ip_address}} -p threadcount={{threads}} -p objectversionlimit={{version_num}} -p numobjects={{objects_num}} -p cassandra.readconsistencylevel={{read_consistency}} -p cassandra.writeconsistencylevel={{write_consistency}} -P workloads/myworkload -s > ~/load.log"
+
+# - name: "Run {{description}} write_consistency={{write_consistency}}, read_consistency={{read_consistency}}"
+#   shell: "chdir=~/ycsb ./bin/ycsb run {{db}} -p hosts={{load_balancer_ip_address}} -p threadcount={{threads}} -p objectversionlimit={{version_num}} -p numobjects={{objects_num}} -p cassandra.readconsistencylevel={{read_consistency}} -p cassandra.writeconsistencylevel={{write_consistency}} -P workloads/myworkload -s > ~/reports/ycsb/{{ansible_date_time.epoch}}_{{description}}_w{{write_consistency}}_r{{read_consistency}}.dat"
 
 - name: "Load {{description}} write_consistency={{write_consistency}}, read_consistency={{read_consistency}}"
-  shell: "chdir={{ycsb_home}} ./bin/ycsb load {{db}} -p hosts=\"{{load_balancer_ip_address}}\" -p threadcount={{threads}} -p objectversionlimit={{version_num}} -p numobjects={{objects_num}} -p cassandra.readconsistencylevel={{read_consistency}} -p cassandra.writeconsistencylevel={{write_consistency}} -P workloads/myworkload -s"
+  shell: "chdir=~/ycsb ./bin/ycsb load {{db}} -p riak.hosts={{load_balancer_ip_address}} -p riak.bucket_type=workload -p threadcount={{threads}} -p objectversionlimit={{version_num}} -p numobjects={{objects_num}} -p riak.r_val={{read_consistency}} -p riak.w_val={{write_consistency}} -p riak.strong_consistency=false -p riak.debug=true -P workloads/myworkload -s > ~/load.log"
+  when: description == 'riak'
 - name: "Run {{description}} write_consistency={{write_consistency}}, read_consistency={{read_consistency}}"
-  shell: "chdir={{ycsb_home}} ./bin/ycsb run {{db}} -p hosts=\"{{load_balancer_ip_address}}\" -p threadcount={{threads}} -p objectversionlimit={{version_num}} -p numobjects={{objects_num}} -p cassandra.readconsistencylevel={{read_consistency}} -p cassandra.writeconsistencylevel={{write_consistency}} -P workloads/myworkload -s > {{ycsb_results_home}}/{{ansible_date_time.epoch}}_{{description}}_w{{write_consistency}}_r{{read_consistency}}.dat"
-  async: 1000000000000000000000000
-  poll: 0
-  register: workload_run_task
-
-- name: "Inject network partition events in the background"
-  shell: "sh fault_injection.sh {{fault_duration}} {{fault_interval}} {{description}} ubuntu"
-  when: with_network_faults
-  async: 1000000000000000000000000
-  poll: 0
-
-- name: "Wait for workload to finish"
-  async_status:
-    jid: "{{ workload_run_task.ansible_job_id }}"
-  register: job_result
-  until: job_result.finished
-  delay: 10
-  retries: 10000000000000000000000
-  
+  shell: "chdir=~/ycsb ./bin/ycsb run {{db}} -p riak.hosts={{load_balancer_ip_address}} -p riak.bucket_type=workload -p threadcount={{threads}} -p objectversionlimit={{version_num}} -p numobjects={{objects_num}} -p riak.r_val={{read_consistency}} -p riak.w_val={{write_consistency}} -p riak.strong_consistency=false -P workloads/myworkload -s > ~/reports/ycsb/{{ansible_date_time.epoch}}_{{description}}_w{{write_consistency}}_r{{read_consistency}}.dat"
+  when: description == 'riak'
 

@@ -1,5 +1,7 @@
 ---
 - name: "Analyse {{filename}}"
-  shell: "chdir={{analyser_home}} python -m bin.main run {{ycsb_results_home}} {{analysis_results_home}}/{{ansible_date_time.epoch}}_analysis.csv"
+  shell: "chdir=~/anayser python -m bin.main run ~/reports/ycsb/ ~/reports/analyser//{{ansible_date_time.epoch}}_analysis.csv"
+  register: out
 
+- debug: msg="{{ out.stdout }}"
 
